@@ -26,28 +26,28 @@ use std::{
 };
 
 use hyper::{
+    Method, Request, Response, StatusCode, Version,
     body::Incoming,
     header::{
-        HeaderValue, CONNECTION, SEC_WEBSOCKET_ACCEPT, SEC_WEBSOCKET_KEY, SEC_WEBSOCKET_VERSION,
+        CONNECTION, HeaderValue, SEC_WEBSOCKET_ACCEPT, SEC_WEBSOCKET_KEY, SEC_WEBSOCKET_VERSION,
         UPGRADE,
     },
     server::conn::http1,
     service::service_fn,
     upgrade::Upgraded,
-    Method, Request, Response, StatusCode, Version,
 };
 use hyper_util::rt::TokioIo;
 use tokio::net::TcpListener;
 
-use futures_channel::mpsc::{unbounded, UnboundedSender};
-use futures_util::{future, pin_mut, stream::TryStreamExt, StreamExt};
+use futures_channel::mpsc::{UnboundedSender, unbounded};
+use futures_util::{StreamExt, future, pin_mut, stream::TryStreamExt};
 
 use tokio_tungstenite::{
+    WebSocketStream,
     tungstenite::{
         handshake::derive_accept_key,
         protocol::{Message, Role},
     },
-    WebSocketStream,
 };
 
 type Tx = UnboundedSender<Message>;
@@ -112,10 +112,7 @@ async fn handle_request(
         || !headers
             .get(CONNECTION)
             .and_then(|h| h.to_str().ok())
-            .map(|h| {
-                h.split(|c| c == ' ' || c == ',')
-                    .any(|p| p.eq_ignore_ascii_case(upgrade.to_str().unwrap()))
-            })
+            .map(|h| h.split([' ', ',']).any(|p| p.eq_ignore_ascii_case(upgrade.to_str().unwrap())))
             .unwrap_or(false)
         || !headers
             .get(UPGRADE)

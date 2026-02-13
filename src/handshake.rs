@@ -1,6 +1,6 @@
 #[cfg(feature = "handshake")]
 use crate::compat::SetWaker;
-use crate::{compat::AllowStd, WebSocketStream};
+use crate::{WebSocketStream, compat::AllowStd};
 use log::*;
 use std::{
     future::Future,
@@ -12,11 +12,11 @@ use tokio::io::{AsyncRead, AsyncWrite};
 use tungstenite::WebSocket;
 #[cfg(feature = "handshake")]
 use tungstenite::{
-    handshake::{
-        client::Response, server::Callback, HandshakeError as Error, HandshakeRole,
-        MidHandshake as WsHandshake,
-    },
     ClientHandshake, ServerHandshake,
+    handshake::{
+        HandshakeError as Error, HandshakeRole, MidHandshake as WsHandshake, client::Response,
+        server::Callback,
+    },
 };
 
 pub(crate) async fn without_handshake<F, S>(stream: S, f: F) -> WebSocketStream<S>

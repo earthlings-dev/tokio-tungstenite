@@ -8,10 +8,11 @@ license = "MIT"
 homepage = "https://github.com/snapview/tokio-tungstenite"
 documentation = "https://docs.rs/tokio-tungstenite/0.28.0"
 repository = "https://github.com/snapview/tokio-tungstenite"
-version = "0.28.0"
-edition = "2018"
-rust-version = "1.63"
+version = "0.28.1"
+edition = "2024"
+rust-version = "1.93"
 include = ["examples/**/*", "src/**/*", "LICENSE", "README.md", "CHANGELOG.md"]
+resolver = "3"
 
 [package.metadata.docs.rs]
 all-features = true
@@ -24,14 +25,14 @@ native-tls = ["native-tls-crate", "tokio-native-tls", "stream", "tungstenite/nat
 native-tls-vendored = ["native-tls", "native-tls-crate/vendored", "tungstenite/native-tls-vendored"]
 rustls-tls-native-roots = ["__rustls-tls", "rustls-native-certs"]
 rustls-tls-webpki-roots = ["__rustls-tls", "webpki-roots"]
-__rustls-tls = ["rustls", "rustls-pki-types", "tokio-rustls", "stream", "tungstenite/__rustls-tls", "handshake"]
+__rustls-tls = ["rustls", "rustls-pki-types", "rustls-ring", "tokio-rustls", "stream", "tungstenite/__rustls-tls", "handshake"]
 stream = []
 url = ["tungstenite/url"]
 
 [dependencies]
-log = "0.4.17"
-futures-util = { version = "0.3.28", default-features = false, features = ["sink", "std"] }
-tokio = { version = "1.0.0", default-features = false, features = ["io-util"] }
+log = "0.4.29"
+futures-util = { version = "0.3.31", default-features = false, features = ["sink", "std"] }
+tokio = { version = "1.49.0", default-features = false, features = ["io-util"] }
 
 [dependencies.tungstenite]
 version = "0.28.0"
@@ -40,20 +41,25 @@ default-features = false
 [dependencies.native-tls-crate]
 optional = true
 package = "native-tls"
-version = "0.2.11"
+version = "0.2.14"
 
 [dependencies.rustls]
 optional = true
-version = "0.23.0"
+version = "0.23.36"
+default-features = false
+
+[dependencies.rustls-ring]
+optional = true
+version = "0.0.1"
 default-features = false
 
 [dependencies.rustls-pki-types]
 optional = true
-version = "1.0"
+version = "1.14"
 
 [dependencies.rustls-native-certs]
 optional = true
-version = "0.8.0"
+version = "0.8.3"
 
 [dependencies.tokio-native-tls]
 optional = true
@@ -61,20 +67,27 @@ version = "0.3.1"
 
 [dependencies.tokio-rustls]
 optional = true
-version = "0.26.0"
+version = "0.26.4"
 default-features = false
+features = ["ring"]
 
 [dependencies.webpki-roots]
 optional = true
-version = "0.26.0"
+version = "1.0.5"
 
 [dev-dependencies]
-futures-channel = "0.3.28"
-hyper = { version = "1.0", default-features = false, features = ["http1", "server"] }
+futures-channel = "0.3.31"
+hyper = { version = "1.8", default-features = false, features = ["http1", "server"] }
 hyper-util = { version = "0.1", features = ["tokio"] }
 http-body-util = "0.1"
-tokio = { version = "1.27.0", default-features = false, features = ["io-std", "macros", "net", "rt-multi-thread", "time"] }
-env_logger = "0.10.0"
+tokio = { version = "1.49.0", default-features = false, features = ["io-std", "macros", "net", "rt-multi-thread", "time"] }
+env_logger = "0.11.8"
+
+[patch.crates-io]
+tungstenite = { git = "https://github.com/earthlings-dev/tungstenite-rs" }
+tokio-rustls = { git = "https://github.com/earthlings-dev/tokio-rustls" }
+rustls = { git = "https://github.com/earthlings-dev/rustls" }
+rustls-ring = { git = "https://github.com/earthlings-dev/rustls" }
 
 [[example]]
 name = "autobahn-client"

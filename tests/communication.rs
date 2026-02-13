@@ -6,7 +6,7 @@ use tokio::{
     io::{AsyncRead, AsyncWrite},
     net::{TcpListener, TcpStream},
 };
-use tokio_tungstenite::{accept_async, client_async, WebSocketStream};
+use tokio_tungstenite::{WebSocketStream, accept_async, client_async};
 use tungstenite::Message;
 
 async fn run_connection<S>(

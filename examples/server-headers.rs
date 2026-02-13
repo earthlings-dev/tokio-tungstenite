@@ -13,9 +13,8 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::{
     accept_hdr_async,
     tungstenite::{
-        connect,
+        Message, connect,
         handshake::server::{Request, Response},
-        Message,
     },
 };
 #[macro_use]

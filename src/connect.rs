@@ -7,7 +7,7 @@ use tungstenite::{
     protocol::WebSocketConfig,
 };
 
-use crate::{domain, stream::MaybeTlsStream, Connector, IntoClientRequest, WebSocketStream};
+use crate::{Connector, IntoClientRequest, WebSocketStream, domain, stream::MaybeTlsStream};
 
 /// Connect to a given URL.
 ///

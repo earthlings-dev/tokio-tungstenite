@@ -5,7 +5,7 @@ use tungstenite::{
     client::uri_mode, error::Error, handshake::client::Response, protocol::WebSocketConfig,
 };
 
-use crate::{client_async_with_config, IntoClientRequest, WebSocketStream};
+use crate::{IntoClientRequest, WebSocketStream, client_async_with_config};
 
 pub use crate::stream::MaybeTlsStream;
 
@@ -33,7 +33,7 @@ mod encryption {
 
         use tokio::io::{AsyncRead, AsyncWrite};
 
-        use tungstenite::{error::TlsError, stream::Mode, Error};
+        use tungstenite::{Error, error::TlsError, stream::Mode};
 
         use crate::stream::MaybeTlsStream;
 
@@ -67,12 +67,13 @@ mod encryption {
         pub use rustls::ClientConfig;
         use rustls::RootCertStore;
         use rustls_pki_types::ServerName;
+        use rustls_ring::DEFAULT_PROVIDER;
         use tokio_rustls::TlsConnector as TokioTlsConnector;
 
         use std::{convert::TryFrom, sync::Arc};
         use tokio::io::{AsyncRead, AsyncWrite};
 
-        use tungstenite::{error::TlsError, stream::Mode, Error};
+        use tungstenite::{Error, error::TlsError, stream::Mode};
 
         use crate::stream::MaybeTlsStream;
 
@@ -115,18 +116,20 @@ mod encryption {
                                 let total_number = certs.len();
                                 let (number_added, number_ignored) =
                                     root_store.add_parsable_certificates(certs);
-                                log::debug!("Added {number_added}/{total_number} native root certificates (ignored {number_ignored})");
+                                log::debug!(
+                                    "Added {number_added}/{total_number} native root certificates (ignored {number_ignored})"
+                                );
                             }
                             #[cfg(feature = "rustls-tls-webpki-roots")]
                             {
                                 root_store.extend(webpki_roots::TLS_SERVER_ROOTS.iter().cloned());
                             }
 
-                            Arc::new(
-                                ClientConfig::builder()
-                                    .with_root_certificates(root_store)
-                                    .with_no_client_auth(),
-                            )
+                            let config = ClientConfig::builder(Arc::new(DEFAULT_PROVIDER))
+                                .with_root_certificates(root_store)
+                                .with_no_client_auth()
+                                .map_err(|e| Error::Io(std::io::Error::other(e.to_string())))?;
+                            Arc::new(config)
                         }
                     };
                     let domain = ServerName::try_from(domain.as_str())

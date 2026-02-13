@@ -13,7 +13,7 @@
 
 use std::{env, io::Error};
 
-use futures_util::{future, StreamExt, TryStreamExt};
+use futures_util::{StreamExt, TryStreamExt, future};
 use log::info;
 use tokio::net::{TcpListener, TcpStream};
 
